@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Created by https://www.toptal.com/developers/gitignore/api/python,direnv,windows,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,direnv,windows,macos
 
@@ -39,6 +40,8 @@ Temporary Items
 *.icloud
 
 ### Python ###
+=======
+>>>>>>> 149e9bdfcb32644b6fa042ee262b0a44b1c574a3
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -199,6 +202,7 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+<<<<<<< HEAD
 
 ### Python Patch ###
 # Poetry local configuration file - https://python-poetry.org/docs/configuration/#local-configuration
@@ -237,3 +241,5 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/python,direnv,windows,macos
+=======
+>>>>>>> 149e9bdfcb32644b6fa042ee262b0a44b1c574a3
