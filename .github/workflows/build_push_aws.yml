@@ -58,8 +58,10 @@ jobs:
         host: ${{secrets.AMAZON_HOST}}
         username: ${{secrets.AMAZON_USER}}
         key: ${{secrets.AMAZON_PEM}}
-        envs: ECR_REGISTRY,REPO_NAME
         script: |
+          ECR_REGISTRY="${{ steps.login-ecr.outputs.registry }}"
+          REPO_NAME="${{ env.REPO_NAME }}"
+          echo "Pulling image $ECR_REGISTRY/$REPO_NAME"
           docker pull $ECR_REGISTRY/$REPO_NAME
           docker stop mycontainer || true
           docker run -d -p 8000:8000 -p 9001:9001 -v /config_cf.yaml:/config_cf.yaml \
