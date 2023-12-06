@@ -35,7 +35,6 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
     - name: Create ECR repository if it doesn't exist
       run: |
-        REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F '/' '{print $2}')
         if ! aws ecr describe-repositories --repository-names ${{env.REPO_NAME}} --region ${{secrets.AWS_REGION}}; then
           aws ecr create-repository --repository-name ${{env.REPO_NAME}} --region ${{secrets.AWS_REGION}}
         fi
@@ -59,13 +58,14 @@ jobs:
         host: ${{secrets.AMAZON_HOST}}
         username: ${{secrets.AMAZON_USER}}
         key: ${{secrets.AMAZON_PEM}}
+        envs: ECR_REGISTRY,REPO_NAME
         script: |
-          docker pull ${{env.ECR_REGISTRY}}/${{env.REPO_NAME}}
+          docker pull $ECR_REGISTRY/$REPO_NAME
           docker stop mycontainer || true
           docker run -d -p 8000:8000 -p 9001:9001 -v /config_cf.yaml:/config_cf.yaml \
           --log-driver=awslogs \
           --log-opt awslogs-group=mycontainer \
           --log-opt awslogs-region=${{secrets.AWS_REGION}} \
           --log-opt awslogs-stream-prefix=docker \
-          --name mycontainer ${{env.ECR_REGISTRY}}/${{env.REPO_NAME}}
+          --name mycontainer $ECR_REGISTRY/$REPO_NAME
 
