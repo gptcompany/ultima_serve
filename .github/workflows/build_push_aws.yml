@@ -41,7 +41,7 @@ jobs:
     - name: Build, tag, and push image to Amazon ECR
       env:
         ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
-        IMAGE_TAG: latest
+        IMAGE_TAG: REPO_NAME
       run: |
         docker build --build-arg OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}} \
         --build-arg GTB_ACCESS_TOKEN=${{secrets.GTB_ACCESS_TOKEN}} \
