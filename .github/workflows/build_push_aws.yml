@@ -80,7 +80,7 @@ jobs:
     - name: Deploy to EC2
       uses: appleboy/ssh-action@master
       env:
-        EC2_USERNAME: ${{ secrets.AMAZON_USER }}
+        EC2_USERNAME: ${{secrets.AMAZON_USER}}
       with:
         host: ${{secrets.AMAZON_HOST}}
         username: ${{secrets.AMAZON_USER}}
@@ -137,7 +137,6 @@ jobs:
 
           echo "Remove Unused Images:"
           docker image prune -a --force --filter "until=24h"
-
           echo "Deployment to EC2 completed."
 
 
