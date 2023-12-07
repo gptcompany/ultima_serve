@@ -74,10 +74,12 @@ jobs:
           docker pull $ECR_REGISTRY/$REPO_NAME
 
           docker stop mycontainer || true
-          docker run -d -p 8000:8000 -p 9001:9001 -v /config_cf.yaml:/config_cf.yaml \
+          docker run -d \
           --log-driver=awslogs \
           --log-opt awslogs-group=mycontainer \
           --log-opt awslogs-region=$AWS_REGION \
-          --log-opt awslogs-stream-prefix=docker \
+          --log-opt awslogs-stream=mycontainer-stream \
+          -p 8000:8000 -p 9001:9001 \
+          -v /config_cf.yaml:/config_cf.yaml \
           --name mycontainer $ECR_REGISTRY/$REPO_NAME
 
