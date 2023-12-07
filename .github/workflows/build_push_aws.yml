@@ -111,7 +111,25 @@ jobs:
           -p 8000:8000 -p 9001:9001 \
           -v /config_cf.yaml:/config_cf.yaml \
           --name mycontainer $ECR_REGISTRY/$REPO_NAME
+
+          echo "Setting up startup script..."
+          echo "#!/bin/bash
+          docker pull $ECR_REGISTRY/$REPO_NAME
+          docker stop mycontainer || true
+          docker rm mycontainer || true
+          docker run --rm -d \
+          --log-driver=awslogs \
+          --log-opt awslogs-group=mycontainer \
+          --log-opt awslogs-region=$AWS_REGION \
+          --log-opt awslogs-stream=mycontainer-stream \
+          -p 8000:8000 -p 9001:9001 \
+          -v /config_cf.yaml:/config_cf.yaml \
+          --name mycontainer $ECR_REGISTRY/$REPO_NAME" > /home/ec2-user/start_container.sh
+          chmod +x /home/ec2-user/start_container.sh
+          (crontab -l 2>/dev/null; echo "@reboot /home/ec2-user/start_container.sh") | crontab -
+
           echo "Remove Unused Images:"
           docker image prune -a --force --filter "until=24h"
+
 
 
