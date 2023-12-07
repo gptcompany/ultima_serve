@@ -79,12 +79,15 @@ jobs:
 
     - name: Deploy to EC2
       uses: appleboy/ssh-action@master
+      env:
+        EC2_USERNAME: ${{ secrets.AMAZON_USER }}
       with:
         host: ${{secrets.AMAZON_HOST}}
         username: ${{secrets.AMAZON_USER}}
         key: ${{secrets.AMAZON_PEM}}
         script: |
           set -e # Exit immediately if a command exits with a non-zero status.
+          set -x # Print each command before executing it
           echo "Deploying to EC2..."
           ECR_REGISTRY="${{ steps.login-ecr.outputs.registry }}"
           REPO_NAME="${{ env.REPO_NAME }}"
@@ -126,9 +129,9 @@ jobs:
           --log-opt awslogs-stream=mycontainer-stream \
           -p 8000:8000 -p 9001:9001 \
           -v /config_cf.yaml:/config_cf.yaml \
-          --name mycontainer $ECR_REGISTRY/$REPO_NAME" > /home/ec2-user/start_container.sh
-          chmod +x /home/ec2-user/start_container.sh
-          (crontab -l 2>/dev/null; echo "@reboot /home/ec2-user/start_container.sh") | crontab -
+          --name mycontainer $ECR_REGISTRY/$REPO_NAME" > /home/$EC2_USERNAME/start_container.sh
+          chmod +x /home/$EC2_USERNAME/start_container.sh
+          (crontab -l 2>/dev/null; echo "@reboot /home/$EC2_USERNAME/start_container.sh") | crontab -
 
           echo "Remove Unused Images:"
           docker image prune -a --force --filter "until=24h"
