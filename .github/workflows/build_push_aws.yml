@@ -106,9 +106,12 @@ jobs:
           echo "Setting up startup script..."
           # cat << 'EOF' > /home/$EC2_USERNAME/start_container.sh
           #!/bin/bash
+          # Check if the container exists, stop and remove if it does
+          # docker ps -a | grep -q mycontainer && docker stop mycontainer && docker rm mycontainer
+
           docker pull $ECR_REGISTRY/$REPO_NAME
-          timeout 60 docker stop mycontainer || true
-          timeout 60 docker rm mycontainer || true
+          # timeout 60 docker stop mycontainer || true
+          # timeout 60 docker rm mycontainer || true
 
           echo "Running mycontainer..."
           timeout 60 docker run --rm -d \
