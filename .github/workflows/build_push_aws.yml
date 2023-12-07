@@ -64,7 +64,9 @@ jobs:
           AWS_ACCESS_KEY_ID="${{ secrets.AMAZON_ACCESS_KEY }}"
           AWS_SECRET_ACCESS_KEY="${{ secrets.AMAZON_SECRET_ACCESS_KEY }}"
           AWS_REGION="${{ secrets.AWS_REGION }}"
-
+          echo "Installing AWS CLI..."
+          sudo apt-get update
+          sudo apt-get install awscli -y
           echo "Logging into Docker ECR..."
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
 
