@@ -118,7 +118,8 @@ jobs:
           --name mycontainer $ECR_REGISTRY/$REPO_NAME
 
           echo "Setting up startup script..."
-          echo "#!/bin/bash
+          cat << 'EOF' > /home/$EC2_USERNAME/start_container.sh
+          #!/bin/bash
           docker pull $ECR_REGISTRY/$REPO_NAME
           docker stop mycontainer || true
           docker rm mycontainer || true
@@ -129,7 +130,8 @@ jobs:
           --log-opt awslogs-stream=mycontainer-stream \
           -p 8000:8000 -p 9001:9001 \
           -v /config_cf.yaml:/config_cf.yaml \
-          --name mycontainer $ECR_REGISTRY/$REPO_NAME" > /home/$EC2_USERNAME/start_container.sh
+          --name mycontainer $ECR_REGISTRY/$REPO_NAME
+          EOF
           chmod +x /home/$EC2_USERNAME/start_container.sh
           (crontab -l 2>/dev/null; echo "@reboot /home/$EC2_USERNAME/start_container.sh") | crontab -
 
