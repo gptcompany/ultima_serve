@@ -130,6 +130,7 @@ jobs:
           echo "Deployment to EC2 completed."
           # Terminate the SSH session explicitly
           exit
+          #
 
 
 
