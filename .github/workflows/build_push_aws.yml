@@ -87,5 +87,6 @@ jobs:
           -v /config_cf.yaml:/config_cf.yaml \
           --name mycontainer $ECR_REGISTRY/$REPO_NAME
           echo "Remove Unused Images:"
-          docker image prune -a --force
+          docker image prune -a --force --filter "until=24h"
+
 
