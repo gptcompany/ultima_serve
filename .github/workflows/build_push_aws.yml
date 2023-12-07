@@ -59,8 +59,8 @@ jobs:
         username: ${{secrets.AMAZON_USER}}
         key: ${{secrets.AMAZON_PEM}}
         script: |
-          ECR_REGISTRY="${{ steps.login-ecr.outputs.registry }}"
-          REPO_NAME="${{ env.REPO_NAME }}"
+          ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+          REPO_NAME=${{ env.REPO_NAME }}
           echo "Pulling image $ECR_REGISTRY/$REPO_NAME"
           docker pull $ECR_REGISTRY/$REPO_NAME
           docker stop mycontainer || true
