@@ -9,28 +9,17 @@ from fastapi.responses import RedirectResponse
 from langserve import add_routes
 #from app_serve.chain import chain as app_serve_chain
 #from pirate_speak.chain import chain as pirate_speak_chain
-from cryptofeed import FeedHandler
-from cryptofeed.exchanges import Binance, BITFINEX
-#from cryptofeed.exchanges import Coinbase, Bitfinex
-#from cryptofeed.connection import AsyncConnection, RestEndpoint, Routes, WebsocketEndpoint
-#from cryptofeed.defines import  L3_BOOK, TRADES, BID, ASK
-#from decimal import Decimal
-from core.chain import feed
 import os
 import asyncio
-import threading
-import multiprocessing
 from multiprocessing import Process, Manager, freeze_support
-import signal
 import logging
 import uvicorn
 import xmlrpc.client
-from pathlib import Path
 import subprocess
-import shlex
 from starlette.responses import StreamingResponse
 import redis
 from datetime import datetime, timezone
+import time
 logging.basicConfig(filename='var/log/server.log', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
 logger = logging.getLogger(__name__)
 
@@ -64,9 +53,16 @@ async def redirect_root_to_docs():
 @app.get("/get-logs/{log_group}")
 async def get_cloudwatch_logs(log_group: str = 'mycontainer', limit: int = 100):
     try:
+        current_time = int(time.time() * 1000)  # Current time in milliseconds
+        past_time = current_time - 3600000  # 1 hour ago in milliseconds
+
         response = cloudwatch_logs.filter_log_events(
             logGroupName=log_group,
-            limit=limit # Fetches the latest 'limit' log events
+            limit=limit,
+            startTime=past_time,
+            endTime=current_time,
+            orderBy='LastEventTime',
+            descending=True
         )
         return response['events']
     except NoCredentialsError:
