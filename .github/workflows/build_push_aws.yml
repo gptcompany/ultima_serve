@@ -86,6 +86,7 @@ jobs:
         script: |
           set -e # Exit immediately if a command exits with a non-zero status.
           set -x # Print each command before executing it
+
           echo "Deploying to EC2..."
           ECR_REGISTRY="${{ steps.login-ecr.outputs.registry }}"
           REPO_NAME="${{ env.REPO_NAME }}"
@@ -93,19 +94,22 @@ jobs:
           AWS_SECRET_ACCESS_KEY="${{ secrets.AMAZON_SECRET_ACCESS_KEY }}"
           AWS_REGION="${{ secrets.AWS_REGION }}"
           EC2_USERNAME="${{secrets.AMAZON_USER}}"
+
           echo "Installing AWS CLI..."
           sudo apt-get update
           sudo apt-get install awscli -y
+
           echo "Logging into Docker ECR..."
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
           
           
           echo "Setting up startup script..."
-          cat << 'EOF' > /home/$EC2_USERNAME/start_container.sh
+          # cat << 'EOF' > /home/$EC2_USERNAME/start_container.sh
           #!/bin/bash
           docker pull $ECR_REGISTRY/$REPO_NAME
           timeout 60 docker stop mycontainer || true
           timeout 60 docker rm mycontainer || true
+
           echo "Running mycontainer..."
           timeout 60 docker run --rm -d \
           --log-driver=awslogs \
@@ -115,12 +119,14 @@ jobs:
           -p 8000:8000 -p 9001:9001 \
           -v /config_cf.yaml:/config_cf.yaml \
           --name mycontainer $ECR_REGISTRY/$REPO_NAME
-          EOF
-          chmod +x /home/$EC2_USERNAME/start_container.sh
-          (crontab -l 2>/dev/null; echo "@reboot /home/$EC2_USERNAME/start_container.sh") | crontab -
+
+          # EOF
+          # chmod +x /home/$EC2_USERNAME/start_container.sh
+          # (crontab -l 2>/dev/null; echo "@reboot /home/$EC2_USERNAME/start_container.sh") | crontab -
 
           echo "Remove Unused Images:"
           docker image prune -a --force --filter "until=2h"
+          
           echo "Deployment to EC2 completed."
           # Terminate the SSH session explicitly
           exit
