@@ -59,15 +59,23 @@ jobs:
         username: ${{secrets.AMAZON_USER}}
         key: ${{secrets.AMAZON_PEM}}
         script: |
-          ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
-          REPO_NAME=${{ env.REPO_NAME }}
-          echo "Pulling image $ECR_REGISTRY/$REPO_NAME"
+          ECR_REGISTRY="${{ steps.login-ecr.outputs.registry }}"
+          REPO_NAME="${{ env.REPO_NAME }}"
+          AWS_ACCESS_KEY_ID="${{ secrets.AMAZON_ACCESS_KEY }}"
+          AWS_SECRET_ACCESS_KEY="${{ secrets.AMAZON_SECRET_ACCESS_KEY }}"
+          AWS_REGION="${{ secrets.AWS_REGION }}"
+
+          echo "Logging into Docker ECR..."
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+          echo "Pulling image $ECR_REGISTRY/$REPO_NAME..."
           docker pull $ECR_REGISTRY/$REPO_NAME
+
           docker stop mycontainer || true
           docker run -d -p 8000:8000 -p 9001:9001 -v /config_cf.yaml:/config_cf.yaml \
           --log-driver=awslogs \
           --log-opt awslogs-group=mycontainer \
-          --log-opt awslogs-region=${{secrets.AWS_REGION}} \
+          --log-opt awslogs-region=$AWS_REGION \
           --log-opt awslogs-stream-prefix=docker \
           --name mycontainer $ECR_REGISTRY/$REPO_NAME
 
