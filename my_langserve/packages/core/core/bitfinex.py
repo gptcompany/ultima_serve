@@ -9,7 +9,8 @@ from decimal import Decimal
 import asyncio
 import logging
 from datetime import datetime
-logging.basicConfig(filename='var/log/bitfinex.log', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
+logging.basicConfig(filename='/var/log/bitfinex.log', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
+logger = logging.getLogger(__name__)
 async def trade(t, receipt_timestamp):
     assert isinstance(t.timestamp, float)
     assert isinstance(t.side, str)
