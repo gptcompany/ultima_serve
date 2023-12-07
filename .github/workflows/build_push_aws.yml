@@ -92,36 +92,22 @@ jobs:
           AWS_ACCESS_KEY_ID="${{ secrets.AMAZON_ACCESS_KEY }}"
           AWS_SECRET_ACCESS_KEY="${{ secrets.AMAZON_SECRET_ACCESS_KEY }}"
           AWS_REGION="${{ secrets.AWS_REGION }}"
+          EC2_USERNAME="${{secrets.AMAZON_USER}}"
           echo "Installing AWS CLI..."
           sudo apt-get update
           sudo apt-get install awscli -y
           echo "Logging into Docker ECR..."
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
-
-          echo "Pulling image $ECR_REGISTRY/$REPO_NAME..."
-          docker pull $ECR_REGISTRY/$REPO_NAME
-          echo "Stopping existing container..."
-          docker stop mycontainer || true
-          echo "Removing existing container..."
-          docker rm mycontainer || true
           
-          echo "Running mycontainer..."
-          docker run --rm -d \
-          --log-driver=awslogs \
-          --log-opt awslogs-group=mycontainer \
-          --log-opt awslogs-region=$AWS_REGION \
-          --log-opt awslogs-stream=mycontainer-stream \
-          -p 8000:8000 -p 9001:9001 \
-          -v /config_cf.yaml:/config_cf.yaml \
-          --name mycontainer $ECR_REGISTRY/$REPO_NAME
-
+          
           echo "Setting up startup script..."
-          cat << 'EOF' > /home/${{secrets.AMAZON_USER}}/start_container.sh
+          cat << 'EOF' > /home/$EC2_USERNAME/start_container.sh
           #!/bin/bash
           docker pull $ECR_REGISTRY/$REPO_NAME
-          docker stop mycontainer || true
-          docker rm mycontainer || true
-          docker run --rm -d \
+          timeout 60 docker stop mycontainer || true
+          timeout 60 docker rm mycontainer || true
+          echo "Running mycontainer..."
+          timeout 60 docker run --rm -d \
           --log-driver=awslogs \
           --log-opt awslogs-group=mycontainer \
           --log-opt awslogs-region=$AWS_REGION \
@@ -130,11 +116,11 @@ jobs:
           -v /config_cf.yaml:/config_cf.yaml \
           --name mycontainer $ECR_REGISTRY/$REPO_NAME
           EOF
-          chmod +x /home/${{secrets.AMAZON_USER}}/start_container.sh
-          (crontab -l 2>/dev/null; echo "@reboot /home/${{secrets.AMAZON_USER}}/start_container.sh") | crontab -
+          chmod +x /home/$EC2_USERNAME/start_container.sh
+          (crontab -l 2>/dev/null; echo "@reboot /home/$EC2_USERNAME/start_container.sh") | crontab -
 
           echo "Remove Unused Images:"
-          docker image prune -a --force --filter "until=24h"
+          docker image prune -a --force --filter "until=2h"
           echo "Deployment to EC2 completed."
 
 
