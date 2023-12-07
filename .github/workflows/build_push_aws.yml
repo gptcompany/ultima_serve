@@ -79,8 +79,6 @@ jobs:
 
     - name: Deploy to EC2
       uses: appleboy/ssh-action@master
-      env:
-        EC2_USERNAME: ${{secrets.AMAZON_USER}}
       with:
         host: ${{secrets.AMAZON_HOST}}
         username: ${{secrets.AMAZON_USER}}
@@ -118,7 +116,7 @@ jobs:
           --name mycontainer $ECR_REGISTRY/$REPO_NAME
 
           echo "Setting up startup script..."
-          cat << 'EOF' > /home/$EC2_USERNAME/start_container.sh
+          cat << 'EOF' > /home/${{secrets.AMAZON_USER}}/start_container.sh
           #!/bin/bash
           docker pull $ECR_REGISTRY/$REPO_NAME
           docker stop mycontainer || true
@@ -132,8 +130,8 @@ jobs:
           -v /config_cf.yaml:/config_cf.yaml \
           --name mycontainer $ECR_REGISTRY/$REPO_NAME
           EOF
-          chmod +x /home/$EC2_USERNAME/start_container.sh
-          (crontab -l 2>/dev/null; echo "@reboot /home/$EC2_USERNAME/start_container.sh") | crontab -
+          chmod +x /home/${{secrets.AMAZON_USER}}/start_container.sh
+          (crontab -l 2>/dev/null; echo "@reboot /home/${{secrets.AMAZON_USER}}/start_container.sh") | crontab -
 
           echo "Remove Unused Images:"
           docker image prune -a --force --filter "until=24h"
