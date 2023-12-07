@@ -57,7 +57,7 @@ jobs:
         ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
         
       run: |
-        docker buildx build \ 
+        docker buildx build \
           --build-arg OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}} \
           --build-arg GTB_ACCESS_TOKEN=${{secrets.GTB_ACCESS_TOKEN}} \
           --build-arg AWS_REGION=${{secrets.AWS_REGION}} \
