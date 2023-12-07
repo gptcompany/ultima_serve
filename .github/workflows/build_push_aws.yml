@@ -76,6 +76,7 @@ jobs:
           docker stop mycontainer || true
           echo "Removing existing container..."
           docker rm mycontainer || true
+          
           echo "Running mycontainer..."
           docker run --rm -d \
           --log-driver=awslogs \
@@ -85,4 +86,6 @@ jobs:
           -p 8000:8000 -p 9001:9001 \
           -v /config_cf.yaml:/config_cf.yaml \
           --name mycontainer $ECR_REGISTRY/$REPO_NAME
+          echo "Remove Unused Images:"
+          docker image prune -a --force
 

@@ -44,7 +44,7 @@ async def book(book, receipt_timestamp):
 async def aio_task():
     while True:
         print("Other task running")
-        await asyncio.sleep(1)       
+        await asyncio.sleep(10)       
 def main():
     path_to_config = '/config_cf.yaml'
     fh = FeedHandler(config=path_to_config)  
@@ -59,15 +59,15 @@ def main():
                     
                 },
                 callbacks={
-                    L3_BOOK: book,#[
+                    L3_BOOK: #book,#[
                         #BookCallback(book),
                         #BookCallback(
-                            #BookRedis(
-                            #host=fh.config.config['redis_host'], 
-                            #port=fh.config.config['redis_port'], 
-                            #snapshots_only=False,
+                            BookRedis(
+                            host=fh.config.config['redis_host'], 
+                            port=fh.config.config['redis_port'], 
+                            snapshots_only=False,
                             #score_key='timestamp',
-                            #                )
+                                            )
                             #         ),
                     #],
                 },
@@ -84,13 +84,13 @@ def main():
                 },
                 callbacks={
                     
-                    TRADES: trade,#[
+                    TRADES: #trade,#[
                         #TradeCallback(trade),
                         #TradeCallback(
-                            #TradeRedis(
-                            #host=fh.config.config['redis_host'], 
-                            #port=fh.config.config['redis_port'],
-                            #                    )
+                            TradeRedis(
+                            host=fh.config.config['redis_host'], 
+                            port=fh.config.config['redis_port'],
+                                                )
                             #       ),
                     #],
                 },

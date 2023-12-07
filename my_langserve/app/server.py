@@ -95,7 +95,7 @@ redis_host="redis-0001-001.redis.tetmd7.apne1.cache.amazonaws.com"
 redis_port="6379"
 key_pattern='BINANCE:BTC-USDT:book'
 @app.get("/check_last_update/{key_pattern}/{threshold_seconds}")
-async def check_last_update(redis_host=redis_host, redis_port=redis_port, key_pattern=key_pattern, threshold_seconds: int = 5):
+async def check_last_update(redis_host=redis_host, redis_port=redis_port, key_pattern=key_pattern, threshold_seconds: float = 5.0):
     
     """
     Check if the last update in Redis for a given key pattern is older than the specified threshold in seconds.

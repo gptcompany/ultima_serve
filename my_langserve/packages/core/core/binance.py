@@ -109,15 +109,15 @@ def main():
                     
                 },
                 callbacks={
-                    L2_BOOK: book, # [
+                    L2_BOOK: #book, # [
                         #BookCallback(book),
                         #BookCallback(
-                            #BookRedis(
-                            #host=fh.config.config['redis_host'], 
-                            #port=fh.config.config['redis_port'], 
-                            #snapshots_only=False,
+                            BookRedis(
+                            host=fh.config.config['redis_host'], 
+                            port=fh.config.config['redis_port'], 
+                            snapshots_only=False,
                             #score_key='timestamp',
-                            #                )
+                                            )
                             #         ),
                     #],
 
@@ -136,13 +136,13 @@ def main():
                     },
                     callbacks={
                         
-                        TRADES: trade, #[
+                        TRADES: #trade, #[
                             #TradeCallback(trade),
                             #TradeCallback(
-                                #TradeRedis(
-                                #host=fh.config.config['redis_host'], 
-                                #port=fh.config.config['redis_port'],
-                                #                    )
+                                TradeRedis(
+                                host=fh.config.config['redis_host'], 
+                                port=fh.config.config['redis_port'],
+                                                    )
                                 #       ),
                         #],
                     },
