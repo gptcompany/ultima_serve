@@ -122,6 +122,8 @@ jobs:
           echo "Remove Unused Images:"
           docker image prune -a --force --filter "until=2h"
           echo "Deployment to EC2 completed."
+          # Terminate the SSH session explicitly
+          exit
 
 
 
