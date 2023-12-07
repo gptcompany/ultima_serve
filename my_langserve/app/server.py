@@ -20,7 +20,7 @@ from starlette.responses import StreamingResponse
 import redis
 from datetime import datetime, timezone
 import time
-logging.basicConfig(filename='var/log/server.log', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
+logging.basicConfig(filename='/var/log/server.log', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
