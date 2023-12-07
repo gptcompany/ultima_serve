@@ -24,7 +24,11 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
-      # Restoring cache
+    # Create a new builder that supports cache export/import
+    - name: Create a new builder
+      run: docker buildx create --name mybuilder --use
+
+    # Cache setup
     - name: Cache Docker layers
       uses: actions/cache@v2
       with:
@@ -53,7 +57,8 @@ jobs:
         ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
         
       run: |
-        docker build --build-arg OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}} \
+        docker buildx build \ 
+          --build-arg OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}} \
           --build-arg GTB_ACCESS_TOKEN=${{secrets.GTB_ACCESS_TOKEN}} \
           --build-arg AWS_REGION=${{secrets.AWS_REGION}} \
           --build-arg AMAZON_ACCESS_KEY=${{secrets.AMAZON_ACCESS_KEY}} \
@@ -61,9 +66,10 @@ jobs:
           -t $ECR_REGISTRY/${{env.REPO_NAME}} \
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache-new \
+          --push \
           ./my_langserve
-        docker push $ECR_REGISTRY/${{env.REPO_NAME}}
         
+
     # Updating cache
     - name: Update cache
       uses: actions/cache@v2
