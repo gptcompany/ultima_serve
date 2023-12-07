@@ -72,8 +72,11 @@ jobs:
 
           echo "Pulling image $ECR_REGISTRY/$REPO_NAME..."
           docker pull $ECR_REGISTRY/$REPO_NAME
-
+          echo "Stopping existing container..."
           docker stop mycontainer || true
+          echo "Removing existing container..."
+          docker rm mycontainer || true
+          echo "Running mycontainer..."
           docker run --rm -d \
           --log-driver=awslogs \
           --log-opt awslogs-group=mycontainer \
