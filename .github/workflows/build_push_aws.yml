@@ -99,11 +99,12 @@ jobs:
     - name: Check if ECS Service Exists
       id: check_service
       run: |
-        SERVICE_EXISTS=$(aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE | jq '.services[] | select(.serviceName == "$ECS_SERVICE") | .serviceName')
+        SERVICE_EXISTS=$(aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE | jq ".services[] | select(.serviceName == \"${ECS_SERVICE}\") | .serviceName")
         if [ -z "$SERVICE_EXISTS" ]; then
           echo "SERVICE_DOES_NOT_EXIST=true" >> $GITHUB_ENV
         else
           echo "SERVICE_DOES_NOT_EXIST=false" >> $GITHUB_ENV
+        fi
 
     - name: Create ECS Service if Not Exists
       if: env.SERVICE_DOES_NOT_EXIST == 'true'
@@ -118,11 +119,12 @@ jobs:
           --scheduling-strategy REPLICA \
           --placement-strategy "type=spread,field=attribute:ecs.availability-zone" "type=spread,field=instanceId" \
           --deployment-controller "type=ECS"
+      
 
     - name: Deploy to ECS
       run: |
         aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $TASK_DEFINITION_TAG:$TASK_DEFINITION_REVISION
-        
+
     - name: Check ECS Service Status
       run: |
         aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE
