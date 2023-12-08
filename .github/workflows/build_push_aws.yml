@@ -54,11 +54,9 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ secrets.AMAZON_ACCESS_KEY }}
-        aws-secret-access-key: ${{ secrets.AMAZON_SECRET_ACCESS_KEY }}
         aws-region: ${{secrets.AWS_REGION}}
         role-to-assume: arn:aws:iam::${{secrets.AWS_ACCOUNT_ID}}:role/github_action
-        role-session-name: GitHubActionSession
+        
 
     - name: Log in to Amazon ECR
       id: login-ecr
@@ -94,7 +92,7 @@ jobs:
         path: /tmp/.buildx-cache-new
         key: ${{ runner.os }}-buildx-${{ github.sha }}
 
-    #ECR_IMAGE="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
+    
     - name: Describe ECS Services (Debugging)
       run: aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE
 
@@ -105,7 +103,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AMAZON_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AMAZON_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
-        #AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }} # If using temporary credentials
+        
 
 
 
