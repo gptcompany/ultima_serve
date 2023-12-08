@@ -96,24 +96,38 @@ jobs:
     - name: Describe ECS Services (Debugging)
       run: aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE
 
-    - name: Deploy to ECS
+    - name: Check if ECS Service Exists
+      id: check_service
       run: |
-        SERVICE_STATUS=$(aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE --query "services[0].status" --output text)
-        if [ "$SERVICE_STATUS" != "ACTIVE" ]; then
-          echo "Service is not active. Creating or reactivating service..."
-          aws ecs create-service \
-          --debug \
+        SERVICE_EXISTS=$(aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE | jq '.services[] | select(.serviceName == "$ECS_SERVICE") | .serviceName')
+        if [ -z "$SERVICE_EXISTS" ]; then
+          echo "SERVICE_DOES_NOT_EXIST=true" >> $GITHUB_ENV
+        else
+          echo "SERVICE_DOES_NOT_EXIST=false" >> $GITHUB_ENV
+
+    - name: Create ECS Service if Not Exists
+      if: env.SERVICE_DOES_NOT_EXIST == 'true'
+      run: |
+        aws ecs create-service \
           --cluster $ECS_CLUSTER \
           --service-name $ECS_SERVICE \
           --task-definition $TASK_DEFINITION_TAG:$TASK_DEFINITION_REVISION \
           --desired-count 1 \
-          --deployment-configuration maximumPercent=200,minimumHealthyPercent=100 \
-          --deployment-circuit-breaker enable=true,rollback=true
-        else
-          echo "Service is active. Updating service..."
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --task-definition $TASK_DEFINITION_TAG:$TASK_DEFINITION_REVISION
-        fi
+          --deployment-configuration "deploymentCircuitBreaker={enable=true,rollback=true},maximumPercent=200,minimumHealthyPercent=100" \
+          --network-configuration "awsvpcConfiguration={assignPublicIp=ENABLED}" \
+          --scheduling-strategy REPLICA \
+          --placement-strategy "type=spread,field=attribute:ecs.availability-zone" "type=spread,field=instanceId" \
+          --deployment-controller "type=ECS"
+
+    - name: Deploy to ECS
+      run: |
+        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $TASK_DEFINITION_TAG:$TASK_DEFINITION_REVISION
         
+    - name: Check ECS Service Status
+      run: |
+        aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE
+
+
       #don't use if OIDC authentication
       # env:
       #   AWS_ACCESS_KEY_ID: ${{ secrets.AMAZON_ACCESS_KEY }}
