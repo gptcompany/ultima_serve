@@ -112,10 +112,10 @@ jobs:
           echo "Service is active. Updating service..."
           aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --task-definition $TASK_DEFINITION_TAG:$TASK_DEFINITION_REVISION
         fi
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AMAZON_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AMAZON_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
+      # env:
+      #   AWS_ACCESS_KEY_ID: ${{ secrets.AMAZON_ACCESS_KEY }}
+      #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AMAZON_SECRET_ACCESS_KEY }}
+      #   AWS_REGION: ${{ secrets.AWS_REGION }}
 
 
 
