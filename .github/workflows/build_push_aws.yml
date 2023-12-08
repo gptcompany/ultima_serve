@@ -84,21 +84,15 @@ jobs:
         key: ${{ runner.os }}-buildx-${{ github.sha }}
 
     - name: Deploy to ECS
-        run: |
-          ECR_IMAGE="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --task-definition $TASK_DEFINITION_TAG:$TASK_DEFINITION_REVISION
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: $AWS_REGION
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AMAZON_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AMAZON_SECRET_ACCESS_KEY }}
+        AWS_REGION: $AWS_REGION
+      run: |
+        ECR_IMAGE="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
+        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --task-definition $TASK_DEFINITION_TAG:$TASK_DEFINITION_REVISION
 
-          echo "Remove Unused Images:"
-          docker image prune -a --force --filter "until=2h"
 
-          echo "Deployment to EC2 completed."
-          # Terminate the SSH session explicitly
-          exit
-          #
 
 
 
