@@ -36,6 +36,7 @@ RUN apt-get update && apt-get install -y supervisor
 # Copy the Supervisor configuration file
 COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+
 EXPOSE 8000
 EXPOSE 9001
 
