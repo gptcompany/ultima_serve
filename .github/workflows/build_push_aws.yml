@@ -98,7 +98,25 @@ jobs:
 
     - name: Deploy to ECS
       run: |
-        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --task-definition $TASK_DEFINITION_TAG:$TASK_DEFINITION_REVISION
+        SERVICE_STATUS=$(aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE --query "services[0].status" --output text)
+        if [ "$SERVICE_STATUS" != "ACTIVE" ]; then
+          echo "Service is not active. Creating or reactivating service..."
+          aws ecs create-service \
+          --cluster $ECS_CLUSTER \
+          --service-name $ECS_SERVICE \
+          --task-definition $TASK_DEFINITION_TAG:$TASK_DEFINITION_REVISION \
+          --desired-count 1 \
+          --deployment-configuration "maximumPercent=200,minimumHealthyPercent=100" \
+          --deployment-circuit-breaker '{"enable":true,"rollback":true}'
+        else
+          echo "Service is active. Updating service..."
+          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --task-definition $TASK_DEFINITION_TAG:$TASK_DEFINITION_REVISION
+        fi
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AMAZON_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AMAZON_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+
 
 
 
