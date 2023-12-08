@@ -122,7 +122,7 @@ jobs:
           --task-definition $TASK_DEFINITION_TAG:$TASK_DEFINITION_REVISION \
           --desired-count 1 \
           --deployment-configuration "deploymentCircuitBreaker={enable=true,rollback=true},maximumPercent=200,minimumHealthyPercent=100" \
-          --network-configuration "awsvpcConfiguration={subnets=[subnet-ab24e2e3,subnet-a035fc8b,subnet-a1d2e2fa],securityGroups=[sg-6c5b961e],assignPublicIp=ENABLED}" \
+          #--network-configuration "awsvpcConfiguration={subnets=[subnet-ab24e2e3,subnet-a035fc8b,subnet-a1d2e2fa],securityGroups=[sg-6c5b961e],assignPublicIp=ENABLED}" \
           --scheduling-strategy REPLICA \
           --placement-strategy "type=spread,field=attribute:ecs.availability-zone" "type=spread,field=instanceId" \
           --deployment-controller "type=ECS"
