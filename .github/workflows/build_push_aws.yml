@@ -22,7 +22,7 @@ jobs:
       ECS_SERVICE: test_service
       IMAGE_TAG: latest
       TASK_DEFINITION_TAG: test
-      TASK_DEFINITION_REVISION: 2
+      TASK_DEFINITION_REVISION: 3
 
     steps:
     - name: Checkout Repository
